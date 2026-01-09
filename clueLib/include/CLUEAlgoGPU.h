@@ -1,5 +1,4 @@
-#ifndef CLUEAlgoGPU_h
-#define CLUEAlgoGPU_h
+#pragma once
 #include <math.h>
 
 #include <iostream>
@@ -674,5 +673,3 @@ void CLUEAlgoGPU<T, NLAYERS, W>::makeClusters()
     copy_tohost();
     CHECK_CUDA_ERROR(cudaStreamSynchronize(stream_));
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef Points_h
-#define Points_h
+#pragma once
 
 struct Points
 {
@@ -48,4 +47,3 @@ struct Points
         n = 0;
     }
 };
-#endif

@@ -45,31 +45,46 @@ add_subdirectory(src)
 
 # SOME TESTS
 enable_testing()
+
+# Shared implementation (run test [cpu/gpu])
+function(run_test_common target label repeats suffix extra_args)
+    file(GLOB inputs "${CMAKE_CURRENT_SOURCE_DIR}/data/input/*.csv")
+    foreach(input_file IN LISTS inputs)
+        get_filename_component(input_dir  "${input_file}" DIRECTORY)
+        get_filename_component(input_name "${input_file}" NAME_WE)
+        get_filename_component(input_ext  "${input_file}" EXT)
+
+        set(test_name   "${input_name}_${label}_${suffix}")
+        set(output_file "${input_dir}/${test_name}${input_ext}")
+
+        add_test(
+                NAME "${test_name}"
+                COMMAND $<TARGET_FILE:${target}>
+                -i "${input_file}"
+                -O "${output_file}"
+                -d 7.0 -r10.0 -o 2 -e "${repeats}" -v
+                ${extra_args}
+        )
+    endforeach()
+endfunction()
+
 function(run_test_cpu target label repeats)
-  FILE(GLOB inputs "${CMAKE_CURRENT_SOURCE_DIR}/data/input/*.csv")
-  foreach(input_file IN LISTS inputs)
-    add_test(NAME ${input_file}_${label}_CPU COMMAND ${target} -i ${input_file} -d 7.0 -r10.0 -o 2 -e ${repeats} -v)
-  endforeach()
+    run_test_common("${target}" "${label}" "${repeats}" "CPU" "")
 endfunction()
 
 function(run_test_gpu target label repeats executor)
-  FILE(GLOB inputs "${CMAKE_CURRENT_SOURCE_DIR}/data/input/*.csv")
-  foreach(input_file IN LISTS inputs)
-    add_test(NAME ${input_file}_${label}_${executor} COMMAND ${target} -i ${input_file} -d 7.0 -r10.0 -o 2 -e ${repeats} -v -u executor)
-  endforeach()
+    # Pass the executor-specific args through to the shared function
+    run_test_common("${target}" "${label}" "${repeats}" "${executor}" "-u;${executor}")
 endfunction()
 
-if(CMAKE_CUDA_COMPILER)
-  run_test_cpu(./src/clue/main main 4)
-  run_test_cpu(src/clue_alpaka/mainAlpaka AlpakaNativeCpu 4)
-  run_test_gpu(./src/clue/main CUDA 100 NativeCuda)
-endif()
 if(alpaka_EXEC_GpuCuda)
-  run_test_gpu(src/clue_alpaka/mainAlpaka Alpaka 100 GpuCuda)
+  run_test_gpu(mainAlpaka Alpaka 100 GpuCuda)
 endif()
+
 if(alpaka_EXEC_CpuOmpBlocks)
-  run_test_gpu(src/clue_alpaka/mainAlpaka Alpaka 100 CpuOmpBlocks)
+  run_test_gpu(mainAlpaka Alpaka 100 CpuOmpBlocks)
 endif()
+
 
 #--- add version files ---------------------------------------------------------
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CLUEVersion.h

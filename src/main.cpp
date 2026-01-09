@@ -10,12 +10,11 @@
 #include <numeric>
 #include <regex>
 #include <string>
-
 #if defined(USE_ALPAKA)
 #    include "CLUEAlgoAlpaka.h"
 
-#    include <alpaka/example/executeForEach.hpp>
-#    include <alpaka/example/executors.hpp>
+#    include <alpaka/onHost/example/executors.hpp>
+#    include <alpaka/onHost/executeForEach.hpp>
 #else
 #    include "CLUEAlgoGPU.h"
 #endif
@@ -212,19 +211,17 @@ void mainRun(
         using namespace alpaka::onHost;
         // Define the index domain
 
-        auto api = alpakaCfg[alpaka::object::api];
-        auto exec = alpakaCfg[alpaka::object::exec];
+        auto deviceSpec = alpakaCfg[object::deviceSpec];
+        auto exec = alpakaCfg[object::exec];
 
-        std::cout << api.getName() << std::endl;
-
-        Platform platform = makePlatform(api);
-        Device computeDevice = platform.makeDevice(0);
-        std::cout << getName(platform) << " compute device=" << computeDevice.getName() << std::endl;
-
+        std::cout << deviceSpec.getApi().getName() << std::endl;
+        auto devSelector = onHost::makeDeviceSelector(deviceSpec);
+        onHost::Device computeDevice = devSelector.makeDevice(0);
+        std::cout << "Using alpaka accelerator: " << onHost::demangledName(exec) << " for "
+                  << deviceSpec.getApi().getName() << std::endl;
         Queue queue = computeDevice.makeQueue();
 
-        Platform cpuPlatform = makePlatform(api::cpu);
-        Device cpuDevice = cpuPlatform.makeDevice(0);
+        Device cpuDevice = makeHostDevice();
 
         CLUEAlgoAlpaka<
             ALPAKA_TYPEOF(exec),
@@ -304,16 +301,23 @@ int main(int argc, char* argv[])
     float dc = 20.f, rhoc = 80.f, outlierDeltaFactor = 2.f;
     int repeats = 10;
     int opt;
+    bool has_outFileName = false;
     std::string inputFileName;
+    std::string outputFileName;
     std::string alpakaExecutor;
     bool list_alpaka_executors = false;
 
-    while((opt = getopt(argc, argv, "i:d:r:o:e:u:Uv")) != -1)
+    while((opt = getopt(argc, argv, "i:d:r:o:O:e:u:Uv")) != -1)
     {
         switch(opt)
         {
         case 'i': /* input filename */
             inputFileName = string(optarg);
+            break;
+        case 'O': /* output filename */
+            std::cout << " reached that" << std::endl;
+            has_outFileName = true;
+            outputFileName = string(optarg);
             break;
         case 'd': /* delta_c */
             dc = stof(string(optarg));
@@ -349,8 +353,14 @@ int main(int argc, char* argv[])
     // MARK -- set input and output files
     //////////////////////////////
     std::cout << "Input file: " << inputFileName << std::endl;
-
-    std::string outputFileName = create_outputfileName(inputFileName, dc, rhoc, outlierDeltaFactor);
+    if(has_outFileName)
+    {
+        outputFileName = create_outputfileName(outputFileName, dc, rhoc, outlierDeltaFactor);
+    }
+    else
+    {
+        outputFileName = create_outputfileName(inputFileName, dc, rhoc, outlierDeltaFactor);
+    }
     std::cout << "Output file: " << outputFileName << std::endl;
 
     //////////////////////////////
@@ -359,20 +369,21 @@ int main(int argc, char* argv[])
     if(use_accelerator)
     {
 #if defined(USE_ALPAKA)
+
         if(list_alpaka_executors)
         {
             std::cout << "alpaka executors" << std::endl;
-            alpaka::executeForEach(
+            alpaka::onHost::executeForEach(
                 [&](auto const& cfg)
                 {
                     std::cout << "  " << alpaka::onHost::getStaticName(cfg[alpaka::object::exec]) << std::endl;
                     return 0;
                 },
-                alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
+                alpaka::onHost::allBackends(alpaka::onHost::enabledApis, alpaka::onHost::example::enabledExecutors));
             return 0;
         }
 
-        return alpaka::executeForEach(
+        return alpaka::onHost::executeForEach(
             [&](auto const& cfg)
             {
                 if(alpakaExecutor == alpaka::onHost::getStaticName(cfg[alpaka::object::exec]))
@@ -389,9 +400,8 @@ int main(int argc, char* argv[])
 
                 return 0;
             },
-            alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis));
+            alpaka::onHost::allBackends(alpaka::onHost::enabledApis, alpaka::onHost::example::enabledExecutors));
 #else
-        std::cout << "xx" << std::endl;
         mainRun(
             inputFileName,
             outputFileName,
@@ -416,8 +426,10 @@ int main(int argc, char* argv[])
             use_accelerator,
         // dummy, not used if alpaka is disabled
 #if defined(USE_ALPAKA)
+
             // select the first valid accelerator, -u is not set therefor we need only a valid configuration
-            std::get<0>(alpaka::onHost::allExecutorsAndApis(alpaka::onHost::enabledApis)),
+            std::get<0>(
+                alpaka::onHost::allBackends(alpaka::onHost::enabledApis, alpaka::onHost::example::enabledExecutors)),
 #else
             std::make_tuple(1, 1),
 #endif

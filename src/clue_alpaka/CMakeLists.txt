@@ -2,7 +2,7 @@
 #       corresponding one built using ALPAKA. Which one to use must be
 #       selected at runtime via a flag.
 
-alpaka_add_executable(mainAlpaka ${PROJECT_SOURCE_DIR}/src/main.cpp)
+add_executable(mainAlpaka ${PROJECT_SOURCE_DIR}/src/main.cpp)
 target_compile_definitions(mainAlpaka PRIVATE USE_ALPAKA)
 target_compile_options(mainAlpaka PRIVATE
   $<$<COMPILE_LANGUAGE:CUDA>:
@@ -22,3 +22,4 @@ target_include_directories(mainAlpaka PUBLIC
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
+alpaka_finalize(mainAlpaka)

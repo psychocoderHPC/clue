@@ -10,6 +10,9 @@ spack*
 *.gdml
 
 *.log
+cmake-build-debug
+clueLib/cmake-build-debug
+data/output
 build
 build.*.log
 NMake

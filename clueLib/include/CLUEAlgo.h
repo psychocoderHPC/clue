@@ -1,6 +1,4 @@
-#ifndef CLUEAlgo_h
-#define CLUEAlgo_h
-
+#pragma once
 // clang-format off
 #include <chrono>
 #include <fstream>
@@ -602,5 +600,3 @@ inline float CLUEAlgo<T, NLAYERS>::distance(int i, int j) const
     float const dy = points_.p_y[i] - points_.p_y[j];
     return std::sqrt(dx * dx + dy * dy);
 }
-
-#endif

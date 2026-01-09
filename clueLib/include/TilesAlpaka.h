@@ -1,6 +1,4 @@
-#ifndef LayerTilesAlpaka_h
-#define LayerTilesAlpaka_h
-
+#pragma once
 #include "GPUVecArrayAlpaka.h"
 #include "TilesConstants.h"
 
@@ -82,4 +80,3 @@ public:
 private:
     GPUAlpaka::VecArray<GPUVect, T::nTiles> tiles_;
 };
-#endif

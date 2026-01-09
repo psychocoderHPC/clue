@@ -1,5 +1,4 @@
-#ifndef GPUVecArray_h
-#define GPUVecArray_h
+#pragma once
 
 namespace GPU
 {
@@ -165,5 +164,3 @@ namespace GPU
     };
 
 } // end namespace GPU
-
-#endif // GPUVecArray_h

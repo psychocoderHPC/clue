@@ -72,7 +72,7 @@ If the projects compiles without errors, you can go run the CLUE algorithm by
 ./build/src/clue_alpaka/mainAlpaka -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u GpuCuda
 
 # alpaka gpu OpenMP
-./build/src/clue_alpaka/mainAlpaka -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u GpuOmpBlocks
+./build/src/clue_alpaka/mainAlpaka -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v -u CpuOmpBlocks
 
 # in case of original CPU without alpaka
 ./build/src/clue/main -i data/input/aniso_1000.csv -d 7.0 -r 10.0 -o 2 -e 10 -v

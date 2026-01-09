@@ -1,5 +1,5 @@
-#ifndef GPUVecArrayAlpaka_h
-#define GPUVecArrayAlpaka_h
+#pragma once
+#include <alpaka/alpaka.hpp>
 
 namespace GPUAlpaka
 {
@@ -57,7 +57,7 @@ namespace GPUAlpaka
         template<typename T_Acc>
         ALPAKA_FN_ACC int push_back(T_Acc const& acc, T const& element)
         {
-            auto previousSize = atomicAdd(acc, &m_size, 1, alpaka::onAcc::hierarchy::Blocks{});
+            auto previousSize = atomicAdd(acc, &m_size, 1, alpaka::onAcc::scope::block);
             if(previousSize < maxSize)
             {
                 m_data[previousSize] = element;
@@ -66,7 +66,7 @@ namespace GPUAlpaka
             else
             {
                 assert(0);
-                atomicSub(acc, &m_size, 1, alpaka::onAcc::hierarchy::Blocks{});
+                atomicSub(acc, &m_size, 1, alpaka::onAcc::scope::block);
                 // assert(("Too few elemets reserved", maxSize));
                 return -1;
             }
@@ -75,7 +75,7 @@ namespace GPUAlpaka
         template<typename T_Acc, class... Ts>
         ALPAKA_FN_ACC int emplace_back(T_Acc const& acc, Ts&&... args)
         {
-            auto previousSize = atomicAdd(acc, &m_size, 1, alpaka::onAcc::hierarchy::Blocks{});
+            auto previousSize = atomicAdd(acc, &m_size, 1, alpaka::onAcc::scope::block);
             if(previousSize < maxSize)
             {
                 (new(&m_data[previousSize]) T(std::forward<Ts>(args)...));
@@ -84,7 +84,7 @@ namespace GPUAlpaka
             else
             {
                 assert(0);
-                atomicSub(acc, &m_size, 1, alpaka::onAcc::hierarchy::Blocks{});
+                atomicSub(acc, &m_size, 1, alpaka::onAcc::scope::block);
                 return -1;
             }
         }
@@ -193,5 +193,3 @@ namespace GPUAlpaka
     };
 
 } // namespace GPUAlpaka
-
-#endif // GPUVecArray_h
