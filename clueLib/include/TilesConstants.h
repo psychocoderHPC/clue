@@ -1,5 +1,4 @@
-#ifndef TilesConstants_h
-#define TilesConstants_h
+#pragma once
 
 namespace util
 {
@@ -25,5 +24,3 @@ struct TilesConstants
     static constexpr int nTiles = nColumns * nRows;
     static constexpr int maxTileDepth = 64; // For accelerators.
 };
-
-#endif // TilesConstants_h

@@ -1,6 +1,4 @@
-#ifndef LayerTilesGPU_h
-#define LayerTilesGPU_h
-
+#pragma once
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -75,4 +73,3 @@ public:
 private:
     GPU::VecArray<GPU::VecArray<int, T::maxTileDepth>, T::nTiles> tiles_;
 };
-#endif

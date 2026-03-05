@@ -1,6 +1,4 @@
-#ifndef LayerTilesAlpaka_h
-#define LayerTilesAlpaka_h
-
+#pragma once
 #include "GPUVecArrayAlpaka.h"
 #include "TilesConstants.h"
 
@@ -9,29 +7,24 @@
 #include <cstdint>
 #include <memory>
 
-#if !defined(ALPAKA_ACC_GPU_CUDA_ENABLED) && !defined(ALPAKA_ACC_GPU_HIP_ENABLED)
+#if !ALPAKA_LANG_CUDA && !ALPAKA_LANG_HIP
 struct int4
 {
     int x, y, z, w;
 };
 #endif
 
-template<typename Acc, typename T>
+template<typename T>
 class TilesAlpaka
 {
 public:
     using GPUVect = GPUAlpaka::VecArray<unsigned int, T::maxTileDepth>;
 
     // constructor
-    TilesAlpaka(Acc const& acc)
-    {
-        acc_ = acc;
-    };
-
     ALPAKA_FN_ACC
-    void fill(float x, float y, int i)
+    void fill(auto const& acc, float x, float y, int i)
     {
-        tiles_[getGlobalBin(x, y)].push_back(acc_, i);
+        tiles_[getGlobalBin(x, y)].push_back(acc, i);
     }
 
     ALPAKA_FN_HOST_ACC int getDim1Bin(float x) const
@@ -73,10 +66,10 @@ public:
             t.reset();
     }
 
-    ALPAKA_FN_HOST_ACC void sort_unsafe(int i)
+    ALPAKA_FN_HOST_ACC void sort_unsafe(auto const& acc, int i)
     {
         // for (int i = 0; i < T::nTiles; ++i)
-        tiles_[i].sort_unsafe(acc_);
+        tiles_[i].sort_unsafe(acc);
     }
 
     ALPAKA_FN_HOST_ACC GPUVect& operator[](int globalBinId)
@@ -86,6 +79,4 @@ public:
 
 private:
     GPUAlpaka::VecArray<GPUVect, T::nTiles> tiles_;
-    Acc const& acc_;
 };
-#endif

@@ -1,16 +1,17 @@
-#ifndef CLUEAlgo_h
-#define CLUEAlgo_h
-
-// C/C++ headers
-#include "Points.h"
-#include "Tiles.h"
-
+#pragma once
+// clang-format off
 #include <chrono>
 #include <fstream>
 #include <functional>
 #include <set>
 #include <string>
 #include <vector>
+
+// C/C++ headers
+#include "Points.h"
+#include "Tiles.h"
+
+// clang-format on
 
 // The type T is used to pass the number of bins in each dimension and the
 // allowed ranges spanned. Ancillary quantities, like the inverse of the bin
@@ -138,7 +139,6 @@ public:
 
         points_.weight.resize(n);
         std::copy(std::begin(weight), std::end(weight), std::begin(points_.weight));
-
 
         points_.p_x = points_.x.data();
         points_.p_y = points_.y.data();
@@ -394,7 +394,8 @@ void CLUEAlgo<T, NLAYERS>::makeClusters()
 
     // std::cout << "STANDALONE: before prepare" << std::endl;
     prepareDataStructures(allLayerTiles);
-    // std::cout << "STANDALONE: after prepare datastructures  makeClusters" << std::endl;
+    // std::cout << "STANDALONE: after prepare datastructures  makeClusters" <<
+    // std::endl;
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = finish - start;
     std::cout << "--- prepareDataStructures:     " << elapsed.count() * 1000 << " ms\n";
@@ -410,7 +411,6 @@ void CLUEAlgo<T, NLAYERS>::makeClusters()
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - start;
     std::cout << "--- calculateDistanceToHigher: " << elapsed.count() * 1000 << " ms\n";
-
 
     findAndAssignClusters();
     // std::cout << "STANDALONE: end makeClusters" << std::endl;
@@ -600,5 +600,3 @@ inline float CLUEAlgo<T, NLAYERS>::distance(int i, int j) const
     float const dy = points_.p_y[i] - points_.p_y[j];
     return std::sqrt(dx * dx + dy * dy);
 }
-
-#endif
