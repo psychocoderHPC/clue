@@ -1,5 +1,4 @@
-#ifndef Points_h
-#define Points_h
+#pragma once
 
 struct Points
 {
@@ -16,7 +15,6 @@ struct Points
     int const* p_layer;
     float const* p_weight;
     float const* p_sigmaNoise;
-
 
     std::vector<float> rho;
     std::vector<float> delta;
@@ -49,4 +47,3 @@ struct Points
         n = 0;
     }
 };
-#endif

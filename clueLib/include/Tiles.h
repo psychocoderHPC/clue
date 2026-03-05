@@ -1,6 +1,4 @@
-#ifndef LayerTiles_h
-#define LayerTiles_h
-
+#pragma once
 #include "TilesConstants.h"
 
 #include <algorithm>
@@ -88,5 +86,3 @@ public:
 private:
     std::vector<std::vector<int>> tiles_;
 };
-
-#endif // LayerTiles_h

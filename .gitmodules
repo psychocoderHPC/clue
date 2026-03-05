@@ -1,4 +1,4 @@
 [submodule "alpaka"]
-	path = alpaka
-	url = https://github.com/psychocoderHPC/alpaka2.git
-	branch = dev
+    path = alpaka
+    url = git@github.com:alpaka-group/alpaka3.git
+    branch = dev
